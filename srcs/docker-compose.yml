@@ -1,14 +1,57 @@
 version: '3.9'
 
 services:
-  nginx:
-    image: nginx:stable-alpine
-  mysql:
-    image: mysql:latest
+  mariadb:
+    build: ./requirements/mariadb
+    image: ekraujin:mariadb
+    container_name: mariadb
     environment:
-      MYSQL_DATABASE: wp
-      MYSQL_USER: wp
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
       MYSQL_PASSWORD: secret
-      MYSQL_SECRET_PASSWORD: secret
-  php:
-    image: php:7.4-fpm-alpine
+    restart: always
+    volumes:
+      - db:/var/lib/mysql
+    ports:
+      - 3306:3306
+    networks:
+      - inception
+
+  # wordpress:
+  #   build: ./requirements/wordpress
+  #   image: ekraujin:wordpress
+  #   container_name: wordpress
+  #   depends_on:
+  #     - mariadb
+  #   restart: always
+  #   ports:
+  #     - '8080:80'
+  #   volumes:
+  #     - wp:/var/www/html
+  #   networks:
+  #     - inception
+
+  nginx:
+    build: ./requirements/nginx
+    image: ekraujin:nginx
+    container_name: nginx
+    depends_on:
+      # - wordpress
+      - mariadb
+    restart: always
+    ports:
+      - 443:443
+    volumes: 
+      - wp:/var/ww/html
+    networks:
+      - inception
+
+networks:
+  inception:
+    driver: bridge
+volumes:
+  db:
+    driver: local
+  wp:
+    driver: local
