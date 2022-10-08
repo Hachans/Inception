@@ -1,12 +1,11 @@
-FROM debian:buster
+FROM alpine:3.15
 
-RUN apt-get update && apt-get install -y mariadb-server mariadb-client
+RUN apk update && apk add --no-cache mariadb mariadb-client mysql mysql-client
 
-COPY ./conf/my.cnf /etc/mysql/my.cnf
-COPY ./conf/init_db.sql/ /var/www/
-
-RUN service mysql start && mysql < /var/www/init_db.sql && rm -f /var/www/init_db.sql;
+COPY ./conf/mariadb-server.cnf /etc/my.cnf.d/mariadb-server.cnf
+COPY ./conf/setup.sh /usr/bin/setup.sh
+COPY ./conf/init.sql /usr/bin/init.sql
 
 EXPOSE 3306
 
-CMD ["mysqld"]
+ENTRYPOINT ["sh", "/usr/bin/setup.sh"]

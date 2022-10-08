@@ -1,15 +1,13 @@
 version: '3.9'
 
 services:
+
   mariadb:
-    build: ./requirements/mariadb
-    image: ekraujin:mariadb
+    build: requirements/mariadb
+    image: mariadb
     container_name: mariadb
-    environment:
-      MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: secret
+    env_file:
+      - .env
     restart: always
     volumes:
       - db:/var/lib/mysql
@@ -18,40 +16,52 @@ services:
     networks:
       - inception
 
-  # wordpress:
-  #   build: ./requirements/wordpress
-  #   image: ekraujin:wordpress
-  #   container_name: wordpress
-  #   depends_on:
-  #     - mariadb
-  #   restart: always
-  #   ports:
-  #     - '8080:80'
-  #   volumes:
-  #     - wp:/var/www/html
-  #   networks:
-  #     - inception
-
-  nginx:
-    build: ./requirements/nginx
-    image: ekraujin:nginx
-    container_name: nginx
+  wordpress:
+    build: requirements/wordpress
+    image: wordpress
+    container_name: wordpress
     depends_on:
-      # - wordpress
       - mariadb
     restart: always
     ports:
+      - '9000:9000'
+    volumes:
+      - wp:/var/www/html
+    networks:
+      - inception
+
+  nginx:
+    build: requirements/nginx
+    image: nginx
+    container_name: nginx
+    depends_on:
+      - wordpress
+    restart: always
+    ports:
       - 443:443
+      - 80:80
     volumes: 
-      - wp:/var/ww/html
+      - wp:/var/www/html
     networks:
       - inception
 
 networks:
   inception:
+    name: inception
     driver: bridge
+
 volumes:
   db:
     driver: local
+    name: db
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/ekraujin/data/db
   wp:
     driver: local
+    name: wp
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/ekraujin/data/wp

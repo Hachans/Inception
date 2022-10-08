@@ -1,3 +1,5 @@
+USE mysql;
+
 CREATE DATABASE IF NOT EXISTS wordpress;
 CREATE USER IF NOT EXISTS 'ekraujin'@'%' IDENTIFIED BY '1111';
 GRANT ALL PRIVILEGES ON wordpress.* TO 'ekraujin'@'%';

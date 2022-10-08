@@ -1,11 +1,19 @@
-FROM debian:buster
+FROM alpine:3.15
 
-RUN apt-get update && apt-get install -y nginx openssl
+RUN apk update && apk add --no-cache nginx openssl 
 
-RUN openssl req -x509 -nodes -newkey rsa:4096 -keyout /etc/ssl/private/nginx.key -out /etc/ssl/certs/nginx.crt -subj "/C=DE/ST=Wob/L=Wob/O=42 School/OU=ekraujin/CN=ekraujin"
+RUN mkdir /etc/nginx/ssl/
 
-COPY ./conf/nginx.conf /etc/nginx/sites-enabled/default
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+	-subj "/C=DE/ST=Niedersachsen/L=Wolfsburg/O=42Wolfsburg/CN=ekraujin" \
+	-keyout /etc/nginx/ssl/nginx-selfsigned.key \
+	-out /etc/nginx/ssl/nginx-selfsigned.crt
+
+COPY ./conf/default.conf /etc/nginx/conf.d/default.conf
+
+# RUN mkdir -p /run/nginx
 
 EXPOSE 443
+EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
