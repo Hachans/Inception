@@ -20,11 +20,13 @@ services:
     build: requirements/wordpress
     image: wordpress
     container_name: wordpress
+    # env_file:
+    #   - .env
     depends_on:
       - mariadb
     restart: always
     ports:
-      - '9000:9000'
+      - 9000:9000
     volumes:
       - wp:/var/www/html
     networks:
@@ -57,11 +59,11 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: /home/ekraujin/data/db
+      device: /home/ekraujin/data/mariadb
   wp:
     driver: local
     name: wp
     driver_opts:
       o: bind
       type: none
-      device: /home/ekraujin/data/wp
+      device: /home/ekraujin/data/wordpress

@@ -1,7 +1,6 @@
 USE mysql;
-
 CREATE DATABASE IF NOT EXISTS wordpress;
-CREATE USER IF NOT EXISTS 'ekraujin'@'%' IDENTIFIED BY '1111';
+CREATE USER IF NOT EXISTS 'ekraujin'@'%' IDENTIFIED BY 'ek';
 GRANT ALL PRIVILEGES ON wordpress.* TO 'ekraujin'@'%';
 FLUSH PRIVILEGES;
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'root1111';
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'ek42';

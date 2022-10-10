@@ -1,19 +1,38 @@
-FROM alpine:3.15
+FROM debian:buster
 
-RUN apk update && apk add --no-cache php php-common php-fpm php-json php-session php-mysqli
+RUN	apt-get update && apt-get install -y php7.3 php-mysqli php-fpm wget sendmail unzip
 
-RUN mkdir -p /var/www/
+RUN mkdir -p /var/www/ && mkdir -p /run/php && mkdir -p /usr/local/bin/wp
+RUN chown www-data:www-data /var/www/
+WORKDIR /var/www/
 
-ADD http://wordpress.org/latest.tar.gz /var/www/
 
-RUN tar -xzf /var/www/latest.tar.gz -C /var/www/ && rm -rf /var/www/latest.tar.gz
+# RUN sed -i "s/listen = \/run\/php\/php7.3-fpm.sock/listen = 9000/" "/etc/php/7.3/fpm/pool.d/www.conf"
 
-RUN adduser -S nginx && addgroup -S nginx && adduser nginx nginx
+# RUN chown -R www-data:www-data /var/www/*;
+# RUN chown -R 755 /var/www/*;
+# RUN touch /run/php/php7.3-fpm.pid
 
-COPY ./conf/www.conf /etc/php7/php-fpm.d/www.conf
-COPY ./conf/start.sh /var/www/start.sh
+# RUN cd /var/www/html;
+# RUN wp core download --allow-root;
+# RUN mv /var/www/wp-config.php /var/www/html/
+
+RUN wget https://wordpress.org/latest.zip
+
+
+RUN unzip ./latest.zip && rm ./latest.zip
+RUN chown  -R www-data:www-data /var/www/wordpress
+RUN mv -n wordpress html
+
+RUN chown -R www-data:www-data /var/www/html
+
+COPY ./conf/www.conf /etc/php/7.3/fpm/pool.d
+COPY ./conf/start.sh /tmp/start.sh
 COPY ./conf/wp-config.php /var/www/html/wp-config.php
+RUN rm -rf /var/www/html/wp-config-sample.php
+
+# RUN	wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && chmod a+x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp
 
 EXPOSE 9000
 
-ENTRYPOINT ["sh", "/var/www/start.sh"]
+ENTRYPOINT ["sh", "/tmp/start.sh"]

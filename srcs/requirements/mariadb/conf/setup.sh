@@ -1,7 +1,3 @@
-#/bin/sh
+chmod -R 777 /var/lib/mysql
 
-mariadb-install-db --user=mysql --ldata=/var/lib/mysql
-
-chown -R mysql:root /var/lib/mysqld
-
-exec mysqld --user=mysql --init-file=/usr/bin/init.sql
+exec mysqld --user=mysql --init-file=/tmp/init.sql
