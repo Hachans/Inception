@@ -20,8 +20,6 @@ services:
     build: requirements/wordpress
     image: wordpress
     container_name: wordpress
-    # env_file:
-    #   - .env
     depends_on:
       - mariadb
     restart: always
@@ -41,7 +39,6 @@ services:
     restart: always
     ports:
       - 443:443
-      - 80:80
     volumes: 
       - wp:/var/www/html
     networks:
